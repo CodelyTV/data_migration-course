@@ -1,6 +1,6 @@
 import { Service } from "diod";
 
-import { PostgresConnection } from "../../../shared/infrastructure/PostgresConnection";
+import { PostgresConnection } from "../../../shared/infrastructure/persistence/PostgresConnection";
 import { Product } from "../domain/Product";
 import { ProductId } from "../domain/ProductId";
 import { ProductRepository } from "../domain/ProductRepository";

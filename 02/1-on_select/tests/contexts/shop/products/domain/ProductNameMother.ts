@@ -4,6 +4,6 @@ import { ProductName } from "../../../../../src/contexts/shop/products/domain/Pr
 
 export class ProductNameMother {
 	static create(value?: string): ProductName {
-		return new ProductName(value ?? faker.string.alphanumeric());
+		return new ProductName(value ?? faker.commerce.productName());
 	}
 }

@@ -1,6 +1,6 @@
 import { test as base } from "@playwright/test";
 
-import { PostgresConnection } from "../../../../../src/contexts/shared/infrastructure/PostgresConnection";
+import { PostgresConnection } from "../../../../../src/contexts/shared/infrastructure/persistence/PostgresConnection";
 
 const databaseConnection = new PostgresConnection();
 

@@ -2,7 +2,7 @@ import { DomainEventFailover } from "../../../../contexts/shared/infrastructure/
 import { RabbitMqConnection } from "../../../../contexts/shared/infrastructure/event_bus/rabbitmq/RabbitMqConnection";
 import { RabbitMqEventBus } from "../../../../contexts/shared/infrastructure/event_bus/rabbitmq/RabbitMqEventBus";
 import { HttpNextResponse } from "../../../../contexts/shared/infrastructure/http/HttpNextResponse";
-import { PostgresConnection } from "../../../../contexts/shared/infrastructure/PostgresConnection";
+import { PostgresConnection } from "../../../../contexts/shared/infrastructure/persistence/PostgresConnection";
 
 export async function POST(): Promise<Response> {
 	const eventBus = new RabbitMqEventBus(

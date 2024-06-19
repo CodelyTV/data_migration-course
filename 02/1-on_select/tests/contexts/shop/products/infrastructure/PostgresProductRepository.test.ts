@@ -1,4 +1,4 @@
-import { PostgresConnection } from "../../../../../src/contexts/shared/infrastructure/PostgresConnection";
+import { PostgresConnection } from "../../../../../src/contexts/shared/infrastructure/persistence/PostgresConnection";
 import { PostgresProductRepository } from "../../../../../src/contexts/shop/products/infrastructure/PostgresProductRepository";
 import { ProductIdMother } from "../domain/ProductIdMother";
 import { ProductMother } from "../domain/ProductMother";

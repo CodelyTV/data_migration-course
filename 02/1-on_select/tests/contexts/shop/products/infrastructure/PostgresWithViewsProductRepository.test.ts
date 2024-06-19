@@ -1,4 +1,4 @@
-import { PostgresConnection } from "../../../../../src/contexts/shared/infrastructure/PostgresConnection";
+import { PostgresConnection } from "../../../../../src/contexts/shared/infrastructure/persistence/PostgresConnection";
 import { PostgresProductReviewRepository } from "../../../../../src/contexts/shop/product_reviews/infrastructure/PostgresProductReviewRepository";
 import { PostgresWithViewsProductRepository } from "../../../../../src/contexts/shop/products/infrastructure/PostgresWithViewsProductRepository";
 import { PostgresUserRepository } from "../../../../../src/contexts/shop/users/infrastructure/PostgresUserRepository";

@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Currency } from "../../../../../contexts/shared/domain/Money";
 import { executeWithErrorHandling } from "../../../../../contexts/shared/infrastructure/http/executeWithErrorHandling";
 import { HttpNextResponse } from "../../../../../contexts/shared/infrastructure/http/HttpNextResponse";
-import { PostgresConnection } from "../../../../../contexts/shared/infrastructure/PostgresConnection";
+import { PostgresConnection } from "../../../../../contexts/shared/infrastructure/persistence/PostgresConnection";
 import { ProductCreator } from "../../../../../contexts/shop/products/application/create/ProductCreator";
 import { ProductFinder } from "../../../../../contexts/shop/products/application/find/ProductFinder";
 import { ProductPrimitives } from "../../../../../contexts/shop/products/domain/Product";

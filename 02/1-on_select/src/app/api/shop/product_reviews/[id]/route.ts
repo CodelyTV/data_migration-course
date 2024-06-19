@@ -8,7 +8,7 @@ import { RabbitMqConnection } from "../../../../../contexts/shared/infrastructur
 import { RabbitMqEventBus } from "../../../../../contexts/shared/infrastructure/event_bus/rabbitmq/RabbitMqEventBus";
 import { executeWithErrorHandling } from "../../../../../contexts/shared/infrastructure/http/executeWithErrorHandling";
 import { HttpNextResponse } from "../../../../../contexts/shared/infrastructure/http/HttpNextResponse";
-import { PostgresConnection } from "../../../../../contexts/shared/infrastructure/PostgresConnection";
+import { PostgresConnection } from "../../../../../contexts/shared/infrastructure/persistence/PostgresConnection";
 import {
 	ProductReviewCreator,
 	ProductReviewCreatorErrors,

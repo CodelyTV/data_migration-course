@@ -1,4 +1,4 @@
-import { PostgresConnection } from "../../../shared/infrastructure/PostgresConnection";
+import { PostgresConnection } from "../../../shared/infrastructure/persistence/PostgresConnection";
 import { ProductReviewRepository } from "../../product_reviews/domain/ProductReviewRepository";
 import { UserDoesNotExistError } from "../../users/domain/UserDoesNotExistError";
 import { UserRepository } from "../../users/domain/UserRepository";

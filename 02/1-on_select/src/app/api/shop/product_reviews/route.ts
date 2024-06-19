@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { HttpNextResponse } from "../../../../contexts/shared/infrastructure/http/HttpNextResponse";
-import { PostgresConnection } from "../../../../contexts/shared/infrastructure/PostgresConnection";
+import { PostgresConnection } from "../../../../contexts/shared/infrastructure/persistence/PostgresConnection";
 import { ProductReviewsByProductSearcher } from "../../../../contexts/shop/product_reviews/application/search_by_product_id/ProductReviewsByProductSearcher";
 import { PostgresProductReviewRepository } from "../../../../contexts/shop/product_reviews/infrastructure/PostgresProductReviewRepository";
 import { ProductPrimitives } from "../../../../contexts/shop/products/domain/Product";

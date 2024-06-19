@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { PostgresConnection } from "../../../../contexts/shared/infrastructure/PostgresConnection";
+import { PostgresConnection } from "../../../../contexts/shared/infrastructure/persistence/PostgresConnection";
 import { AllProductsSearcher } from "../../../../contexts/shop/products/application/search_all/AllProductsSearcher";
 import { ProductPrimitives } from "../../../../contexts/shop/products/domain/Product";
 import { PostgresProductRepository } from "../../../../contexts/shop/products/infrastructure/PostgresProductRepository";

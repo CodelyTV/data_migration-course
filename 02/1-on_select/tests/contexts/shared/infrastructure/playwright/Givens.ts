@@ -1,6 +1,6 @@
 import type { APIRequestContext } from "playwright-core";
 
-import { PostgresConnection } from "../../../../../src/contexts/shared/infrastructure/PostgresConnection";
+import { PostgresConnection } from "../../../../../src/contexts/shared/infrastructure/persistence/PostgresConnection";
 import { ProductReview } from "../../../../../src/contexts/shop/product_reviews/domain/ProductReview";
 import { Product } from "../../../../../src/contexts/shop/products/domain/Product";
 import { PostgresProductRepository } from "../../../../../src/contexts/shop/products/infrastructure/PostgresProductRepository";
