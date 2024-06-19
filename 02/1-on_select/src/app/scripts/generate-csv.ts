@@ -4,6 +4,7 @@ import { ProductMother } from "../../../tests/contexts/shop/products/domain/Prod
 
 async function main(): Promise<void> {
 	const csvPath = "databases/data/products.csv";
+	const csvDelimiter = ";";
 	const totalProductsToGenerate = 1_000_000;
 	const batchSize = 10_000;
 	let batchData = "";
@@ -12,7 +13,7 @@ async function main(): Promise<void> {
 
 	for (let i = 0; i < totalProductsToGenerate; i++) {
 		const product = ProductMother.create().toPrimitives();
-		const line = `${product.id},${product.name},${product.price.amount},${product.price.currency}\n`;
+		const line = `${product.id}${csvDelimiter}${product.name}${csvDelimiter}${product.price.amount}${csvDelimiter}${product.price.currency}${csvDelimiter}{${product.imageUrls.map((image) => `"${image}"`).join(",")}}${csvDelimiter}\n`;
 		batchData += line;
 
 		if ((i + 1) % batchSize === 0 || i === totalProductsToGenerate - 1) {
