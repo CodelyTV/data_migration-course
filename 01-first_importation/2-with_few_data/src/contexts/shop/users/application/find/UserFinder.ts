@@ -1,8 +1,8 @@
 import { Primitives } from "@codelytv/primitives-type/src";
 import { Service } from "diod";
 
+import { DomainUserFinder } from "../../domain/DomainUserFinder";
 import { User } from "../../domain/User";
-import { UserFinder as DomainUserFinder } from "../../domain/UserFinder";
 import { UserRepository } from "../../domain/UserRepository";
 
 @Service()

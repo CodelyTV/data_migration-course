@@ -7,7 +7,9 @@ import { RetentionUserRepository } from "../domain/RetentionUserRepository";
 
 type DatabaseUser = {
 	id: string;
+	email: string;
 	last_activity_date: Date;
+	registration_date: Date;
 };
 
 @Service()
@@ -18,19 +20,18 @@ export class PostgresRetentionUserRepository extends RetentionUserRepository {
 
 	async save(user: RetentionUser): Promise<void> {
 		const userPrimitives = user.toPrimitives();
-		const date = `${userPrimitives.lastActivityDate.toISOString().split("T")[0]} ${
-			userPrimitives.lastActivityDate.toISOString().split("T")[1].split(".")[0]
-		}`;
 
-		const query = `
-			INSERT INTO retention.users (id, last_activity_date)
-			VALUES ('${userPrimitives.id}', '${date}');`;
-
-		await this.connection.execute(query);
+		await this.connection.execute`
+			INSERT INTO retention.users (id, email, last_activity_date, registration_date)
+			VALUES (${userPrimitives.id},
+					${userPrimitives.email},
+					${userPrimitives.lastActivityDate},
+					${userPrimitives.registrationDate});
+			`;
 	}
 
 	async search(id: UserId): Promise<RetentionUser | null> {
-		const query = `SELECT id, last_activity_date FROM retention.users WHERE id = '${id.value}';`;
+		const query = `SELECT id, email, last_activity_date, registration_date FROM retention.users WHERE id = '${id.value}';`;
 
 		const result = await this.connection.searchOne<DatabaseUser>(query);
 
@@ -40,7 +41,9 @@ export class PostgresRetentionUserRepository extends RetentionUserRepository {
 
 		return RetentionUser.fromPrimitives({
 			id: result.id,
+			email: result.email,
 			lastActivityDate: result.last_activity_date,
+			registrationDate: result.registration_date,
 		});
 	}
 }

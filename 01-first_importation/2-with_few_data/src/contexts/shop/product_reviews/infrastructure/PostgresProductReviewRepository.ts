@@ -29,7 +29,7 @@ export class PostgresProductReviewRepository implements ProductReviewRepository 
 			'${review.comment.value}'
 		);`;
 
-		await this.connection.execute(query);
+		await this.connection.executeUnsafe(query);
 	}
 
 	async searchByProduct(productId: ProductId): Promise<ProductReview[]> {

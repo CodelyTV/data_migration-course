@@ -26,7 +26,7 @@ export class PostgresProductRepository implements ProductRepository {
 	async save(product: Product): Promise<void> {
 		const productPrimitives = product.toPrimitives();
 
-		await this.connection.execute(`
+		await this.connection.executeUnsafe(`
 			INSERT INTO shop.products (id, name, price_amount, price_currency, image_urls, latest_top_reviews)
 			VALUES (
 				'${product.id.value}',

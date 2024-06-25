@@ -28,7 +28,7 @@ export class PostgresUserRepository implements UserRepository {
 				'${userPrimitives.profilePicture}'
 			);`;
 
-		await this.connection.execute(query);
+		await this.connection.executeUnsafe(query);
 	}
 
 	async search(id: UserId): Promise<User | null> {
