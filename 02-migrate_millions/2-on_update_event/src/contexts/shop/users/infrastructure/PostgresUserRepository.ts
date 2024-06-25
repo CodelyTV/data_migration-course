@@ -19,16 +19,20 @@ export class PostgresUserRepository implements UserRepository {
 	async save(user: User): Promise<void> {
 		const userPrimitives = user.toPrimitives();
 
-		const query = `
+		await this.connection.execute`
 			INSERT INTO shop.users (id, name, email, profile_picture)
 			VALUES (
-				'${userPrimitives.id}',
-				'${userPrimitives.name}',
-				'${userPrimitives.email}',
-				'${userPrimitives.profilePicture}'
-			);`;
-
-		await this.connection.executeUnsafe(query);
+				${userPrimitives.id},
+				${userPrimitives.name},
+				${userPrimitives.email},
+				${userPrimitives.profilePicture}
+		   )
+			ON CONFLICT (id)
+			DO UPDATE SET
+				name = EXCLUDED.name,
+				email = EXCLUDED.email,
+				profile_picture = EXCLUDED.profile_picture;
+		`;
 	}
 
 	async search(id: UserId): Promise<User | null> {

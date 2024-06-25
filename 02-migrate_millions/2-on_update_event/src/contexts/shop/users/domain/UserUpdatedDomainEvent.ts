@@ -1,7 +1,7 @@
 import { DomainEvent, DomainEventAttributes } from "../../../shared/domain/event/DomainEvent";
 
 export class UserUpdatedDomainEvent extends DomainEvent {
-	static eventName = "codely.shop.user.*_updated";
+	static eventName = "codely.shop.user.*.updated";
 
 	constructor(
 		eventName: string,

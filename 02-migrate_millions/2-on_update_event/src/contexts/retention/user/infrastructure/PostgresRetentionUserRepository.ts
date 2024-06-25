@@ -39,7 +39,7 @@ export class PostgresRetentionUserRepository extends RetentionUserRepository {
 			return await this.tryToImport(id);
 		}
 
-		console.log(`Shop user ${id.value} is already imported`);
+		console.log(` > Shop user ${id.value} is already imported`);
 
 		return RetentionUser.fromPrimitives({
 			id: result.id,
@@ -65,7 +65,7 @@ export class PostgresRetentionUserRepository extends RetentionUserRepository {
 
 		await this.save(retentionUser);
 
-		console.log(`Shop user ${id.value} imported to retention context`);
+		console.log(` > Shop user ${id.value} imported to retention context`);
 
 		return retentionUser;
 	}

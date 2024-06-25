@@ -40,6 +40,10 @@ export class HttpNextResponse {
 		return new NextResponse(null, { status: 201 });
 	}
 
+	static noContent(): NextResponse {
+		return new NextResponse(null, { status: 204 });
+	}
+
 	static json<JsonBody>(data: JsonBody): NextResponse {
 		return NextResponse.json(data, { status: 200 });
 	}
