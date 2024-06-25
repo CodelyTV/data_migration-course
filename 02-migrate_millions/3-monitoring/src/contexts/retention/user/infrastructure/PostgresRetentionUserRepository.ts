@@ -1,4 +1,5 @@
 import { Service } from "diod";
+import promClient from "prom-client";
 
 import { PostgresConnection } from "../../../shared/infrastructure/persistence/PostgresConnection";
 import { UserId } from "../../../shop/users/domain/UserId";
@@ -11,6 +12,12 @@ type DatabaseUser = {
 	last_activity_date: Date;
 	registration_date: Date;
 };
+
+const userImportCounter = new promClient.Counter({
+	name: "retention_user_import_count",
+	help: "Counter for user imports",
+	labelNames: ["imported"],
+});
 
 @Service()
 export class PostgresRetentionUserRepository extends RetentionUserRepository {
@@ -40,6 +47,7 @@ export class PostgresRetentionUserRepository extends RetentionUserRepository {
 		}
 
 		console.log(` > Shop user ${id.value} is already imported`);
+		userImportCounter.inc({ imported: "false" });
 
 		return RetentionUser.fromPrimitives({
 			id: result.id,
@@ -66,6 +74,7 @@ export class PostgresRetentionUserRepository extends RetentionUserRepository {
 		await this.save(retentionUser);
 
 		console.log(` > Shop user ${id.value} imported to retention context`);
+		userImportCounter.inc({ imported: "true" });
 
 		return retentionUser;
 	}

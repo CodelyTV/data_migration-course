@@ -6,6 +6,7 @@ import { EmailSender } from "../../../retention/email/domain/EmailSender";
 import { FakeEmailSender } from "../../../retention/email/infrastructure/FakeEmailSender";
 import { CreateRetentionUserOnUserRegistered } from "../../../retention/user/application/create/CreateRetentionUserOnUserRegistered";
 import { RetentionUserCreator } from "../../../retention/user/application/create/RetentionUserCreator";
+import { RetentionUserFinder } from "../../../retention/user/application/find/RetentionUserFinder";
 import { RetentionUserLastActivityUpdater } from "../../../retention/user/application/update_last_activity_date/RetentionUserLastActivityUpdater";
 import { UpdateLastActivityDateOnUserUpdated } from "../../../retention/user/application/update_last_activity_date/UpdateLastActivityDateOnUserUpdated";
 import { RetentionUserRepository } from "../../../retention/user/domain/RetentionUserRepository";
@@ -20,6 +21,9 @@ import { DomainProductFinder } from "../../../shop/products/domain/DomainProduct
 import { ProductRepository } from "../../../shop/products/domain/ProductRepository";
 import { PostgresProductRepository } from "../../../shop/products/infrastructure/PostgresProductRepository";
 import { UserFinder } from "../../../shop/users/application/find/UserFinder";
+import { UserRegistrar } from "../../../shop/users/application/registrar/UserRegistrar";
+import { UserEmailUpdater } from "../../../shop/users/application/update_email/UserEmailUpdater";
+import { DomainUserFinder } from "../../../shop/users/domain/DomainUserFinder";
 import { UserRepository } from "../../../shop/users/domain/UserRepository";
 import { PostgresUserRepository } from "../../../shop/users/infrastructure/PostgresUserRepository";
 import { EventBus } from "../../domain/event/EventBus";
@@ -35,7 +39,7 @@ const builder = new ContainerBuilder();
 // Shared
 builder.register(UuidGenerator).use(OfficialUuidGenerator);
 
-builder.registerAndUse(PostgresConnection);
+builder.registerAndUse(PostgresConnection).asSingleton();
 
 builder.registerAndUse(RabbitMqConnection);
 builder.registerAndUse(DomainEventFailover);
@@ -54,6 +58,9 @@ builder.registerAndUse(ProductReviewCreator);
 
 builder.register(UserRepository).use(PostgresUserRepository);
 builder.registerAndUse(UserFinder);
+builder.registerAndUse(DomainUserFinder);
+builder.registerAndUse(UserRegistrar);
+builder.registerAndUse(UserEmailUpdater);
 
 // Retention context
 builder.register(EmailSender).use(FakeEmailSender);
@@ -65,5 +72,6 @@ builder.registerAndUse(UpdateLastActivityDateOnUserUpdated).addTag("subscriber")
 builder.registerAndUse(RetentionUserLastActivityUpdater);
 builder.registerAndUse(CreateRetentionUserOnUserRegistered).addTag("subscriber");
 builder.registerAndUse(RetentionUserCreator);
+builder.registerAndUse(RetentionUserFinder);
 
 export const container = builder.build();

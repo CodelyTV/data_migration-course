@@ -1,5 +1,5 @@
 services:
-  2_2_first_importation-postgres:
+  2_3_first_importation-postgres:
     image: postgres:latest
     restart: always
 
@@ -13,7 +13,7 @@ services:
       - db_data:/var/lib/postgresql/data
       - ./databases:/docker-entrypoint-initdb.d
 
-  2_2_first_importation-rabbitmq:
+  2_3_first_importation-rabbitmq:
     image: 'rabbitmq:3.12-management'
     restart: unless-stopped
     ports:
@@ -23,5 +23,29 @@ services:
       - RABBITMQ_DEFAULT_USER=codely
       - RABBITMQ_DEFAULT_PASS=codely
 
+  2_3_first_importation-grafana:
+    image: grafana/grafana:10.4.5
+    restart: always
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./etc/grafana/provisioning:/etc/grafana/provisioning
+      - ./etc/grafana/dashboards:/var/lib/grafana/dashboards
+
+  2_3_first_importation-prometheus:
+    image: prom/prometheus:v2.45.6
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+      - ./etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
 volumes:
   db_data:
+  grafana_data:
+  prometheus_data:

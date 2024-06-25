@@ -21,6 +21,10 @@ async function registerUser(): Promise<void> {
 			profilePicture: user.profilePicture,
 		}),
 	});
+
+	if (Math.random() < 0.3) {
+		await getRetentionUser(user.id);
+	}
 }
 
 async function updateUserEmail(): Promise<void> {
@@ -43,15 +47,33 @@ async function updateUserEmail(): Promise<void> {
 	});
 }
 
+async function getRetentionUser(id?: string): Promise<void> {
+	const query = id
+		? `SELECT id FROM shop.users WHERE id = '${id}'`
+		: "SELECT id FROM shop.users ORDER BY RANDOM() LIMIT 1";
+
+	const existingUser = await connection.searchOne<{ id: string }>(query);
+
+	if (!existingUser) {
+		return;
+	}
+
+	await fetch(`http://localhost:3000/api/retention/users/${existingUser.id}`, {
+		method: "GET",
+	});
+}
+
 async function main(): Promise<void> {
 	while (true) {
 		if (Math.random() < 0.5) {
 			await registerUser();
-		} else {
+		} else if (Math.random() < 0.5) {
 			await updateUserEmail();
+		} else {
+			await getRetentionUser();
 		}
 
-		await new Promise((resolve) => setTimeout(resolve, 2000));
+		await new Promise((resolve) => setTimeout(resolve, 500));
 	}
 }
 

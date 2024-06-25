@@ -1,7 +1,10 @@
+import { Service } from "diod";
+
 import { EventBus } from "../../../../shared/domain/event/EventBus";
 import { DomainUserFinder } from "../../domain/DomainUserFinder";
 import { UserRepository } from "../../domain/UserRepository";
 
+@Service()
 export class UserEmailUpdater {
 	constructor(
 		private readonly repository: UserRepository,
