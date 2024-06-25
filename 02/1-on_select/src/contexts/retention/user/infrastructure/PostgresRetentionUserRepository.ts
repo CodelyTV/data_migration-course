@@ -36,8 +36,10 @@ export class PostgresRetentionUserRepository extends RetentionUserRepository {
 		const result = await this.connection.searchOne<DatabaseUser>(query);
 
 		if (!result) {
-			return null;
+			return await this.tryToImport(id);
 		}
+
+		console.log(`Shop user ${id.value} is already imported`);
 
 		return RetentionUser.fromPrimitives({
 			id: result.id,
@@ -45,5 +47,43 @@ export class PostgresRetentionUserRepository extends RetentionUserRepository {
 			lastActivityDate: result.last_activity_date,
 			registrationDate: result.registration_date,
 		});
+	}
+
+	async tryToImport(id: UserId): Promise<RetentionUser | null> {
+		const shopUser = await this.fetchShopUser(id);
+
+		if (shopUser === null) {
+			return null;
+		}
+
+		const retentionUser = RetentionUser.fromPrimitives({
+			id: shopUser.id,
+			email: shopUser.email,
+			lastActivityDate: new Date(),
+			registrationDate: new Date(),
+		});
+
+		await this.save(retentionUser);
+
+		console.log(`Shop user ${id.value} imported to retention context`);
+
+		return retentionUser;
+	}
+
+	async fetchShopUser(id: UserId): Promise<{ id: string; email: string } | null> {
+		const response = await fetch(`http://localhost:3000/api/shop/users/${id.value}`, {
+			method: "GET",
+		});
+
+		if (!response.ok) {
+			return null;
+		}
+
+		const data = await response.json();
+
+		return {
+			id: data.id,
+			email: data.email,
+		};
 	}
 }

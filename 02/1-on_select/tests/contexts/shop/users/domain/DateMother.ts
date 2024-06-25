@@ -5,6 +5,10 @@ export class DateMother {
 		return new Date(value ?? faker.date.recent());
 	}
 
+	static now(): Date {
+		return new Date();
+	}
+
 	static today(): Date {
 		return new Date();
 	}
