@@ -11,7 +11,8 @@
     "test:unit": "jest tests/contexts",
     "test:acceptance": "playwright test",
     "check": "npm run lint && npm run build && npm run test",
-    "generate-csv": "ts-node ./src/app/scripts/generate-csv.ts",
+    "register-users": "ts-node ./src/app/scripts/register-users.ts",
+    "generate-csvs": "ts-node ./src/app/scripts/generate-csvs.ts",
     "configure-rabbitmq": "ts-node ./src/app/scripts/configure-rabbitmq.ts",
     "consume-rabbitmq": "ts-node ./src/app/scripts/consume-rabbitmq.ts"
   },

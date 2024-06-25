@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import postgres from "postgres";
 
 export class PostgresConnection {
@@ -12,6 +13,7 @@ export class PostgresConnection {
 				password: "c0d3ly7v",
 				database: "ecommerce",
 				onnotice: () => {},
+				max: 20,
 			});
 		}
 
@@ -26,12 +28,16 @@ export class PostgresConnection {
 		return (await this.sql.unsafe(query)) as T[];
 	}
 
-	async execute(query: string): Promise<void> {
+	async execute(strings: TemplateStringsArray, ...values: any[]): Promise<void> {
+		await this.sql(strings, ...values);
+	}
+
+	async executeUnsafe(query: string): Promise<void> {
 		await this.sql.unsafe(query);
 	}
 
 	async truncateAll(): Promise<void> {
-		await this.execute(`DO
+		await this.executeUnsafe(`DO
 $$
 DECLARE
     r RECORD;
@@ -47,6 +53,6 @@ $$;`);
 	}
 
 	async refresh(productWithReviewsMaterialized: string): Promise<void> {
-		await this.execute(`REFRESH MATERIALIZED VIEW ${productWithReviewsMaterialized}`);
+		await this.executeUnsafe(`REFRESH MATERIALIZED VIEW ${productWithReviewsMaterialized}`);
 	}
 }

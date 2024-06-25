@@ -4,8 +4,10 @@ import { SendWelcomeEmailOnUserRegistered } from "../../../retention/email/appli
 import { WelcomeEmailSender } from "../../../retention/email/application/send_welcome_email/WelcomeEmailSender";
 import { EmailSender } from "../../../retention/email/domain/EmailSender";
 import { FakeEmailSender } from "../../../retention/email/infrastructure/FakeEmailSender";
+import { CreateRetentionUserOnUserRegistered } from "../../../retention/user/application/create/CreateRetentionUserOnUserRegistered";
+import { RetentionUserCreator } from "../../../retention/user/application/create/RetentionUserCreator";
+import { RetentionUserLastActivityUpdater } from "../../../retention/user/application/update_last_activity_date/RetentionUserLastActivityUpdater";
 import { UpdateLastActivityDateOnUserUpdated } from "../../../retention/user/application/update_last_activity_date/UpdateLastActivityDateOnUserUpdated";
-import { UserLastActivityUpdater } from "../../../retention/user/application/update_last_activity_date/UserLastActivityUpdater";
 import { RetentionUserRepository } from "../../../retention/user/domain/RetentionUserRepository";
 import { PostgresRetentionUserRepository } from "../../../retention/user/infrastructure/PostgresRetentionUserRepository";
 import { ProductReviewCreator } from "../../../shop/product_reviews/application/create/ProductReviewCreator";
@@ -26,10 +28,11 @@ import { DomainEventFailover } from "../event_bus/failover/DomainEventFailover";
 import { RabbitMqConnection } from "../event_bus/rabbitmq/RabbitMqConnection";
 import { RabbitMqEventBus } from "../event_bus/rabbitmq/RabbitMqEventBus";
 import { OfficialUuidGenerator } from "../OfficialUuidGenerator";
-import { PostgresConnection } from "../PostgresConnection";
+import { PostgresConnection } from "../persistence/PostgresConnection";
 
 const builder = new ContainerBuilder();
 
+// Shared
 builder.register(UuidGenerator).use(OfficialUuidGenerator);
 
 builder.registerAndUse(PostgresConnection);
@@ -38,23 +41,29 @@ builder.registerAndUse(RabbitMqConnection);
 builder.registerAndUse(DomainEventFailover);
 builder.register(EventBus).use(RabbitMqEventBus);
 
-builder.registerAndUse(SendWelcomeEmailOnUserRegistered).addTag("subscriber");
-builder.registerAndUse(WelcomeEmailSender);
-builder.register(EmailSender).use(FakeEmailSender);
-
-builder.registerAndUse(UpdateLastActivityDateOnUserUpdated).addTag("subscriber");
-builder.registerAndUse(UserLastActivityUpdater);
-builder.register(RetentionUserRepository).use(PostgresRetentionUserRepository);
-
-builder.registerAndUse(ProductReviewCreator);
-builder.register(ProductReviewRepository).use(PostgresProductReviewRepository);
-builder.registerAndUse(UserFinder);
+// Shop context
+builder.register(ProductRepository).use(PostgresProductRepository);
 builder.registerAndUse(ProductFinder);
+builder.registerAndUse(DomainProductFinder);
 
 builder.registerAndUse(UpdateLatestTopReviewsOnProductReviewCreated).addTag("subscriber");
 builder.registerAndUse(ProductLatestTopReviewsUpdater);
-builder.register(ProductRepository).use(PostgresProductRepository);
-builder.registerAndUse(DomainProductFinder);
+
+builder.register(ProductReviewRepository).use(PostgresProductReviewRepository);
+builder.registerAndUse(ProductReviewCreator);
+
 builder.register(UserRepository).use(PostgresUserRepository);
+builder.registerAndUse(UserFinder);
+
+// Retention context
+builder.register(EmailSender).use(FakeEmailSender);
+builder.registerAndUse(SendWelcomeEmailOnUserRegistered).addTag("subscriber");
+builder.registerAndUse(WelcomeEmailSender);
+
+builder.register(RetentionUserRepository).use(PostgresRetentionUserRepository);
+builder.registerAndUse(UpdateLastActivityDateOnUserUpdated).addTag("subscriber");
+builder.registerAndUse(RetentionUserLastActivityUpdater);
+builder.registerAndUse(CreateRetentionUserOnUserRegistered).addTag("subscriber");
+builder.registerAndUse(RetentionUserCreator);
 
 export const container = builder.build();

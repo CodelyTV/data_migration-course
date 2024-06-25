@@ -21,7 +21,7 @@ export class PostgresWithJoinsProductRepository implements ProductRepository {
 	constructor(private readonly connection: PostgresConnection) {}
 
 	async save(product: Product): Promise<void> {
-		await this.connection.execute(`
+		await this.connection.executeUnsafe(`
 			INSERT INTO shop.products (id, name, price_amount, price_currency, image_urls)
 			VALUES (
 						   '${product.id.value}',

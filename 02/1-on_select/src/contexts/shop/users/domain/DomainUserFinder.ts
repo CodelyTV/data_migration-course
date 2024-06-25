@@ -3,7 +3,7 @@ import { UserDoesNotExistError } from "./UserDoesNotExistError";
 import { UserId } from "./UserId";
 import { UserRepository } from "./UserRepository";
 
-export class UserFinder {
+export class DomainUserFinder {
 	constructor(private readonly repository: UserRepository) {}
 
 	async find(id: string): Promise<User> {

@@ -1,7 +1,7 @@
 import { DomainEvent, DomainEventAttributes } from "../../../shared/domain/event/DomainEvent";
 
-export class UserDomainEvent extends DomainEvent {
-	static eventName = "codely.shop.user.*";
+export class UserUpdatedDomainEvent extends DomainEvent {
+	static eventName = "codely.shop.user.*_updated";
 
 	constructor(
 		eventName: string,
@@ -17,8 +17,13 @@ export class UserDomainEvent extends DomainEvent {
 		eventId: string,
 		occurredOn: Date,
 		_attributes: DomainEventAttributes,
-	): UserDomainEvent {
-		return new UserDomainEvent(UserDomainEvent.eventName, aggregateId, eventId, occurredOn);
+	): UserUpdatedDomainEvent {
+		return new UserUpdatedDomainEvent(
+			UserUpdatedDomainEvent.eventName,
+			aggregateId,
+			eventId,
+			occurredOn,
+		);
 	}
 
 	toPrimitives(): { [key: string]: unknown } {
