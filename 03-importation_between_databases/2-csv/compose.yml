@@ -1,0 +1,45 @@
+services:
+  3_1_first_importation-postgres:
+    image: postgres:latest
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: codely
+      POSTGRES_PASSWORD: c0d3ly7v
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./databases/postgres:/docker-entrypoint-initdb.d
+      - ./databases/data:/docker-entrypoint-initdb.d/data
+
+  3_1_first_importation-mysql:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: adminpassword
+      MYSQL_DATABASE: ecommerce
+      MYSQL_USER: codely
+      MYSQL_PASSWORD: c0d3ly7v
+      TZ: UTC
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./databases/mysql/retention.sql:/docker-entrypoint-initdb.d/init.sql
+
+  3_1_first_importation-rabbitmq:
+    image: 'rabbitmq:3.12-management'
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=codely
+      - RABBITMQ_DEFAULT_PASS=codely
+
+volumes:
+  db_data:
+  grafana_data:
+  prometheus_data:
