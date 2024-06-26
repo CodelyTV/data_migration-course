@@ -1,5 +1,5 @@
 services:
-  3_1_first_importation-postgres:
+  3_2_first_importation-postgres:
     image: postgres:latest
     restart: unless-stopped
 
@@ -14,7 +14,7 @@ services:
       - ./databases/postgres:/docker-entrypoint-initdb.d
       - ./databases/data:/docker-entrypoint-initdb.d/data
 
-  3_1_first_importation-mysql:
+  3_2_first_importation-mysql:
     image: mariadb:11
     restart: unless-stopped
     environment:
@@ -28,8 +28,9 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./databases/mysql/retention.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./etc/queries/3-export_csv_import_csv:/var/lib/mysql/shared
 
-  3_1_first_importation-rabbitmq:
+  3_2_first_importation-rabbitmq:
     image: 'rabbitmq:3.12-management'
     restart: unless-stopped
     ports:
