@@ -1,2 +1,1 @@
-# Seleccionamos las fechas que queremos + las formateamos a timestamp mysql
 PGPASSWORD=c0d3ly7v psql -h localhost -p 5432 -U codely -d ecommerce -c "\COPY (SELECT id, email, to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') AS last_activity_date, to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') AS registration_date FROM shop.users) TO 'postgres_dump-shop.users_with_retention_format.csv' WITH (FORMAT CSV);"
