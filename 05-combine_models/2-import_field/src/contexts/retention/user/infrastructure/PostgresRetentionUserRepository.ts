@@ -1,5 +1,4 @@
 import { Service } from "diod";
-import promClient from "prom-client";
 
 import { PostgresConnection } from "../../../shared/infrastructure/persistence/PostgresConnection";
 import { UserId } from "../../../shop/users/domain/UserId";
@@ -11,13 +10,8 @@ type DatabaseUser = {
 	email: string;
 	last_activity_date: Date;
 	registration_date: Date;
+	total_reviews: number;
 };
-
-const userImportCounter = new promClient.Counter({
-	name: "retention_user_import_count",
-	help: "Counter for user imports",
-	labelNames: ["imported"],
-});
 
 @Service()
 export class PostgresRetentionUserRepository extends RetentionUserRepository {
@@ -29,12 +23,18 @@ export class PostgresRetentionUserRepository extends RetentionUserRepository {
 		const userPrimitives = user.toPrimitives();
 
 		await this.connection.execute`
-			INSERT INTO retention.users (id, email, last_activity_date, registration_date)
+			INSERT INTO retention.users (id, email, last_activity_date, registration_date, total_reviews)
 			VALUES (${userPrimitives.id},
 					${userPrimitives.email},
 					${userPrimitives.lastActivityDate},
-					${userPrimitives.registrationDate});
-			`;
+					${userPrimitives.registrationDate},
+					${userPrimitives.totalReviews})
+			ON CONFLICT (id) DO UPDATE SET
+				email = EXCLUDED.email,
+				last_activity_date = EXCLUDED.last_activity_date,
+				registration_date = EXCLUDED.registration_date,
+				total_reviews = EXCLUDED.total_reviews;
+		`;
 	}
 
 	async search(id: UserId): Promise<RetentionUser | null> {
@@ -43,56 +43,15 @@ export class PostgresRetentionUserRepository extends RetentionUserRepository {
 		const result = await this.connection.searchOne<DatabaseUser>(query);
 
 		if (!result) {
-			return await this.tryToImport(id);
+			return null;
 		}
-
-		console.log(` > Shop user ${id.value} is already imported`);
-		userImportCounter.inc({ imported: "false" });
 
 		return RetentionUser.fromPrimitives({
 			id: result.id,
 			email: result.email,
 			lastActivityDate: result.last_activity_date,
 			registrationDate: result.registration_date,
+			totalReviews: result.total_reviews,
 		});
-	}
-
-	async tryToImport(id: UserId): Promise<RetentionUser | null> {
-		const shopUser = await this.fetchShopUser(id);
-
-		if (shopUser === null) {
-			return null;
-		}
-
-		const retentionUser = RetentionUser.fromPrimitives({
-			id: shopUser.id,
-			email: shopUser.email,
-			lastActivityDate: new Date(),
-			registrationDate: new Date(),
-		});
-
-		await this.save(retentionUser);
-
-		console.log(` > Shop user ${id.value} imported to retention context`);
-		userImportCounter.inc({ imported: "true" });
-
-		return retentionUser;
-	}
-
-	async fetchShopUser(id: UserId): Promise<{ id: string; email: string } | null> {
-		const response = await fetch(`http://localhost:3000/api/shop/users/${id.value}`, {
-			method: "GET",
-		});
-
-		if (!response.ok) {
-			return null;
-		}
-
-		const data = await response.json();
-
-		return {
-			id: data.id,
-			email: data.email,
-		};
 	}
 }

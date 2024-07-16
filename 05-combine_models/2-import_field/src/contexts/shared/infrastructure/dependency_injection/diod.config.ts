@@ -7,6 +7,8 @@ import { FakeEmailSender } from "../../../retention/email/infrastructure/FakeEma
 import { CreateRetentionUserOnUserRegistered } from "../../../retention/user/application/create/CreateRetentionUserOnUserRegistered";
 import { RetentionUserCreator } from "../../../retention/user/application/create/RetentionUserCreator";
 import { RetentionUserFinder } from "../../../retention/user/application/find/RetentionUserFinder";
+import { IncrementRetentionUserTotalReviewsOnProductReviewCreated } from "../../../retention/user/application/increment_total_reviews/IncrementRetentionUserTotalReviewsOnProductReviewCreated";
+import { RetentionUserTotalReviewsIncrementer } from "../../../retention/user/application/increment_total_reviews/RetentionUserTotalReviewsIncrementer";
 import { RetentionUserLastActivityUpdater } from "../../../retention/user/application/update_last_activity_date/RetentionUserLastActivityUpdater";
 import { UpdateLastActivityDateOnUserUpdated } from "../../../retention/user/application/update_last_activity_date/UpdateLastActivityDateOnUserUpdated";
 import { RetentionUserRepository } from "../../../retention/user/domain/RetentionUserRepository";
@@ -68,10 +70,17 @@ builder.registerAndUse(SendWelcomeEmailOnUserRegistered).addTag("subscriber");
 builder.registerAndUse(WelcomeEmailSender);
 
 builder.register(RetentionUserRepository).use(PostgresRetentionUserRepository);
+builder.registerAndUse(RetentionUserFinder);
+
 builder.registerAndUse(UpdateLastActivityDateOnUserUpdated).addTag("subscriber");
 builder.registerAndUse(RetentionUserLastActivityUpdater);
+
 builder.registerAndUse(CreateRetentionUserOnUserRegistered).addTag("subscriber");
 builder.registerAndUse(RetentionUserCreator);
-builder.registerAndUse(RetentionUserFinder);
+
+builder
+	.registerAndUse(IncrementRetentionUserTotalReviewsOnProductReviewCreated)
+	.addTag("subscriber");
+builder.registerAndUse(RetentionUserTotalReviewsIncrementer);
 
 export const container = builder.build();

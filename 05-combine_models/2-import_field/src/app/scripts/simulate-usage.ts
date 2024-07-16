@@ -1,33 +1,13 @@
 /* eslint-disable no-constant-condition,no-await-in-loop,no-promise-executor-return */
 // noinspection InfiniteLoopJS
 
-import { UserEmailMother } from "../../../tests/contexts/shop/users/domain/UserEmailMother";
-import { UserMother } from "../../../tests/contexts/shop/users/domain/UserMother";
+import { faker } from "@faker-js/faker";
+
 import { PostgresConnection } from "../../contexts/shared/infrastructure/persistence/PostgresConnection";
 
 const connection = new PostgresConnection();
 
-async function registerUser(): Promise<void> {
-	const user = UserMother.create().toPrimitives();
-
-	await fetch(`http://localhost:3000/api/shop/users/${user.id}`, {
-		method: "PUT",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({
-			name: user.name,
-			email: user.email,
-			profilePicture: user.profilePicture,
-		}),
-	});
-
-	if (Math.random() < 0.3) {
-		await getRetentionUser(user.id);
-	}
-}
-
-async function updateUserEmail(): Promise<void> {
+async function reviewProduct(): Promise<void> {
 	const existingUser = await connection.searchOne<{ id: string }>(
 		"SELECT * FROM shop.users ORDER BY RANDOM() LIMIT 1",
 	);
@@ -36,42 +16,31 @@ async function updateUserEmail(): Promise<void> {
 		return;
 	}
 
-	await fetch(`http://localhost:3000/api/shop/users/${existingUser.id}/email`, {
+	const existingProduct = await connection.searchOne<{ id: string }>(
+		"SELECT * FROM shop.products ORDER BY RANDOM() LIMIT 1",
+	);
+
+	if (existingProduct === null) {
+		return;
+	}
+
+	await fetch(`http://localhost:3000/api/shop/product_reviews/${faker.string.uuid()}`, {
 		method: "PUT",
 		headers: {
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify({
-			email: UserEmailMother.create().value,
+			userId: existingUser.id,
+			productId: existingProduct.id,
+			rating: faker.number.int({ min: 1, max: 5 }),
+			comment: faker.lorem.sentence({ min: 5, max: 10 }),
 		}),
-	});
-}
-
-async function getRetentionUser(id?: string): Promise<void> {
-	const query = id
-		? `SELECT id FROM shop.users WHERE id = '${id}'`
-		: "SELECT id FROM shop.users ORDER BY RANDOM() LIMIT 1";
-
-	const existingUser = await connection.searchOne<{ id: string }>(query);
-
-	if (!existingUser) {
-		return;
-	}
-
-	await fetch(`http://localhost:3000/api/retention/users/${existingUser.id}`, {
-		method: "GET",
 	});
 }
 
 async function main(): Promise<void> {
 	while (true) {
-		if (Math.random() < 0.5) {
-			await registerUser();
-		} else if (Math.random() < 0.5) {
-			await updateUserEmail();
-		} else {
-			await getRetentionUser();
-		}
+		await reviewProduct();
 
 		await new Promise((resolve) => setTimeout(resolve, 500));
 	}

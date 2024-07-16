@@ -6,3 +6,6 @@ CREATE TABLE retention.users (
 	last_activity_date TIMESTAMP WITH TIME ZONE NOT NULL,
 	registration_date TIMESTAMP WITH TIME ZONE NOT NULL
 );
+
+COPY shop.users(id, name, email, profile_picture)
+	FROM '/docker-entrypoint-initdb.d/data/users.csv' DELIMITER ';' CSV HEADER;

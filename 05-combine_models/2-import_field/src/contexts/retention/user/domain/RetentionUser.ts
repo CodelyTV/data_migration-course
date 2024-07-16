@@ -6,6 +6,7 @@ export type RetentionUserPrimitives = {
 	email: string;
 	lastActivityDate: Date;
 	registrationDate: Date;
+	totalReviews: number | null;
 };
 
 export class RetentionUser {
@@ -14,6 +15,7 @@ export class RetentionUser {
 		public readonly email: UserEmail,
 		private lastActivityDate: Date,
 		private readonly registrationDate: Date,
+		private totalReviews: number | null,
 	) {}
 
 	static fromPrimitives(primitives: RetentionUserPrimitives): RetentionUser {
@@ -22,6 +24,7 @@ export class RetentionUser {
 			new UserEmail(primitives.email),
 			primitives.lastActivityDate,
 			primitives.registrationDate,
+			primitives.totalReviews,
 		);
 	}
 
@@ -31,11 +34,20 @@ export class RetentionUser {
 			email,
 			lastActivityDate: registrationDate,
 			registrationDate,
+			totalReviews: 0,
 		});
 	}
 
 	updateLastActivityDate(lastActivityDate: Date): void {
 		this.lastActivityDate = lastActivityDate;
+	}
+
+	lastActivityDateIsOlderThan(other: Date): boolean {
+		return this.lastActivityDate <= other;
+	}
+
+	incrementTotalReviews(): void {
+		this.totalReviews = (this.totalReviews ?? 0) + 1;
 	}
 
 	toPrimitives(): RetentionUserPrimitives {
@@ -44,10 +56,7 @@ export class RetentionUser {
 			email: this.email.value,
 			lastActivityDate: this.lastActivityDate,
 			registrationDate: this.registrationDate,
+			totalReviews: this.totalReviews,
 		};
-	}
-
-	lastActivityDateIsOlderThan(other: Date): boolean {
-		return this.lastActivityDate <= other;
 	}
 }

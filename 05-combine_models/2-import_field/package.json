@@ -11,6 +11,7 @@
     "test:unit": "jest tests/contexts",
     "test:acceptance": "playwright test",
     "check": "npm run lint && npm run build && npm run test",
+    "import-total_reviews": "ts-node ./src/app/scripts/import-total_reviews.ts",
     "simulate-usage": "ts-node ./src/app/scripts/simulate-usage.ts",
     "generate-csvs": "ts-node ./src/app/scripts/generate-csvs.ts",
     "configure-rabbitmq": "ts-node ./src/app/scripts/configure-rabbitmq.ts",
