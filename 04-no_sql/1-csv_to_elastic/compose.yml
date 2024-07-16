@@ -1,5 +1,5 @@
 services:
-  3_2_first_importation-postgres:
+  4_1_first_importation-postgres:
     image: postgres:latest
     restart: unless-stopped
 
@@ -14,24 +14,8 @@ services:
       - ./databases/postgres:/docker-entrypoint-initdb.d
       - ./databases/data:/docker-entrypoint-initdb.d/data
 
-  3_2_first_importation-mysql:
-    image: mariadb:11
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: adminpassword
-      MYSQL_DATABASE: ecommerce
-      MYSQL_USER: codely
-      MYSQL_PASSWORD: c0d3ly7v
-      TZ: UTC
-    ports:
-      - "3306:3306"
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./databases/mysql/retention.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./etc/queries/3-export_csv_import_csv:/var/lib/mysql/shared
-
-  3_2_first_importation-rabbitmq:
-    image: 'rabbitmq:3.12-management'
+  4_1_first_importation-rabbitmq:
+    image: rabbitmq:3.12-management
     restart: unless-stopped
     ports:
       - "5672:5672"
@@ -40,7 +24,27 @@ services:
       - RABBITMQ_DEFAULT_USER=codely
       - RABBITMQ_DEFAULT_PASS=codely
 
+  4_1_first_importation-elasticsearch:
+    image: elasticsearch:8.14.3
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+
+  4_1_first_importation-logstash:
+    image: logstash:8.14.3
+    volumes:
+      - ./etc/logstash/config:/usr/share/logstash/config
+      - ./etc/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./etc/queries:/usr/share/logstash/queries
+    ports:
+      - "5044:5044"
+    depends_on:
+      - 4_1_first_importation-elasticsearch
+
 volumes:
   db_data:
-  grafana_data:
   prometheus_data:

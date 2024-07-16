@@ -1,0 +1,2 @@
+http.host: "0.0.0.0"
+xpack.monitoring.elasticsearch.hosts: [ "http://4_1_first_importation-elasticsearch:9200" ]
