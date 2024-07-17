@@ -3,12 +3,13 @@ package tv.codely.ecommerce
 import akka.actor.ActorSystem
 import akka.stream.alpakka.slick.scaladsl._
 import akka.stream.scaladsl.{Flow, Sink}
+import com.typesafe.config.ConfigFactory
 import slick.jdbc.PostgresProfile.api._
 import tv.codely.ecommerce.tables.ShopUsersTable
 
 object Importer {
   def main(args: Array[String]): Unit = {
-    implicit val system: ActorSystem   = ActorSystem()
+    implicit val system: ActorSystem   = ActorSystem("mySystem", ConfigFactory.load())
     implicit val session: SlickSession = SlickSession.forConfig("ecommerce")
     import system.dispatcher
 
@@ -16,7 +17,7 @@ object Importer {
 
     case class UserReviews(userId: String, totalReviews: Int)
 
-    val selectFlow = Flow[String].mapAsync(parallelism = 1) { userId =>
+    val selectFlow = Flow[String].mapAsync(parallelism = 10) { userId =>
       session.db.run(
         for {
           _ <- DBIO.successful(println(s"Processing user ID: $userId"))
@@ -30,7 +31,7 @@ object Importer {
       )
     }
 
-    val updateFlow = Flow[UserReviews].mapAsync(parallelism = 1) { userReviews =>
+    val updateSink = Sink.foreach[UserReviews] { userReviews =>
       session.db.run(
         for {
           updatedRows <- sqlu"""
@@ -50,8 +51,7 @@ object Importer {
         user._1
       })
       .via(selectFlow)
-      .via(updateFlow)
-      .runWith(Sink.ignore)
+      .runWith(updateSink)
       .onComplete { tryResult =>
         system.terminate()
 
