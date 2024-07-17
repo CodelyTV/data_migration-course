@@ -17,7 +17,9 @@ object Importer {
 
     case class UserReviews(userId: String, totalReviews: Int)
 
-    val selectFlow = Flow[String].mapAsync(parallelism = 10) { userId =>
+    val selectFlow = Flow[String].mapAsync(parallelism = 2) { userId =>
+//      Thread.sleep(1000)
+
       session.db.run(
         for {
           _ <- DBIO.successful(println(s"Processing user ID: $userId"))
@@ -32,6 +34,8 @@ object Importer {
     }
 
     val updateSink = Sink.foreach[UserReviews] { userReviews =>
+//      Thread.sleep(2000)
+
       session.db.run(
         for {
           updatedRows <- sqlu"""
