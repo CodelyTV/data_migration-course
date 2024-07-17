@@ -1,13 +1,10 @@
 package tv.codely.ecommerce
 
-import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.alpakka.slick.scaladsl._
 import akka.stream.scaladsl.{Flow, Sink}
 import slick.jdbc.PostgresProfile.api._
 import tv.codely.ecommerce.tables.ShopUsersTable
-
-import scala.concurrent.Future
 
 object Importer {
   def main(args: Array[String]): Unit = {
@@ -17,44 +14,53 @@ object Importer {
 
     system.registerOnTermination(session.close())
 
-    val done: Future[Done] =
-      Slick
-        .source(TableQuery[ShopUsersTable].result)
-        .via(Flow[ShopUsersTable#TableElementType].map { user =>
-          println(s"Processing user: ${user._2}: ${user._1}")
+    case class UserReviews(userId: String, totalReviews: Int)
 
-			user._1
-        })
-        .via(
-          Slick.flow { userId: String =>
-            for {
-              _ <- DBIO.successful(println(s"Processing user ID: $userId"))
-              totalReviews <- sql"""
-                SELECT COALESCE(COUNT(*), 0) AS total
-                FROM shop.product_reviews
-                WHERE user_id = $userId::uuid
-              """.as[Int].headOption.map(_.getOrElse(0))
-              _ <- DBIO.successful(println(s"Total reviews for user $userId: $totalReviews"))
-              updatedRows <- sqlu"""
-                UPDATE retention.users
-                SET total_reviews = $totalReviews
-                WHERE id = $userId::uuid
-              """
-              _ <- DBIO.successful(println(s"Updated rows: $updatedRows"))
-            } yield updatedRows
-          }
-        )
-        .runWith(Sink.ignore)
-
-    done.onComplete { tryResult =>
-      system.terminate()
-
-      if (tryResult.isFailure) {
-        println("ERROR")
-        println(tryResult.failed.get)
-
-        System.exit(1)
-      }
+    val selectFlow = Flow[String].mapAsync(parallelism = 1) { userId =>
+      session.db.run(
+        for {
+          _ <- DBIO.successful(println(s"Processing user ID: $userId"))
+          totalReviews <- sql"""
+            SELECT COALESCE(COUNT(*), 0) AS total
+            FROM shop.product_reviews
+            WHERE user_id = $userId::uuid
+          """.as[Int].headOption.map(_.getOrElse(0))
+          _ <- DBIO.successful(println(s"Total reviews for user $userId: $totalReviews"))
+        } yield UserReviews(userId, totalReviews)
+      )
     }
+
+    val updateFlow = Flow[UserReviews].mapAsync(parallelism = 1) { userReviews =>
+      session.db.run(
+        for {
+          updatedRows <- sqlu"""
+            UPDATE retention.users
+            SET total_reviews = ${userReviews.totalReviews}
+            WHERE id = ${userReviews.userId}::uuid
+          """
+          _ <- DBIO.successful(println(s"Updated rows: $updatedRows"))
+        } yield updatedRows
+      )
+    }
+
+    Slick
+      .source(TableQuery[ShopUsersTable].result)
+      .via(Flow[ShopUsersTable#TableElementType].map { user =>
+        println(s"Processing user: ${user._2}: ${user._1}")
+        user._1
+      })
+      .via(selectFlow)
+      .via(updateFlow)
+      .runWith(Sink.ignore)
+      .onComplete { tryResult =>
+        system.terminate()
+
+        if (tryResult.isFailure) {
+          println("ERROR")
+          println(tryResult.failed.get)
+
+          System.exit(1)
+        }
+      }
   }
 }
