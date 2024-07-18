@@ -1,8 +1,11 @@
+import "reflect-metadata";
+
 import { isLeft } from "fp-ts/Either";
 import * as t from "io-ts";
 import { PathReporter } from "io-ts/PathReporter";
 import { NextRequest } from "next/server";
 
+import { container } from "../../../../../contexts/shared/infrastructure/dependency_injection/diod.config";
 import { DomainEventFailover } from "../../../../../contexts/shared/infrastructure/event_bus/failover/DomainEventFailover";
 import { RabbitMqConnection } from "../../../../../contexts/shared/infrastructure/event_bus/rabbitmq/RabbitMqConnection";
 import { RabbitMqEventBus } from "../../../../../contexts/shared/infrastructure/event_bus/rabbitmq/RabbitMqEventBus";
@@ -40,7 +43,7 @@ export async function PUT(
 
 	const body = validatedRequest.right;
 
-	const postgresConnection = new PostgresConnection();
+	const postgresConnection = container.get(PostgresConnection);
 
 	const userRepository = new PostgresUserRepository(postgresConnection);
 	const reviewRepository = new PostgresProductReviewRepository(postgresConnection);

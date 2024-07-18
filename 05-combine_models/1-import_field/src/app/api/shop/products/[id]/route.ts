@@ -1,9 +1,12 @@
+import "reflect-metadata";
+
 import { isLeft } from "fp-ts/Either";
 import * as t from "io-ts";
 import { PathReporter } from "io-ts/PathReporter";
 import { NextRequest, NextResponse } from "next/server";
 
 import { Currency } from "../../../../../contexts/shared/domain/Money";
+import { container } from "../../../../../contexts/shared/infrastructure/dependency_injection/diod.config";
 import { executeWithErrorHandling } from "../../../../../contexts/shared/infrastructure/http/executeWithErrorHandling";
 import { HttpNextResponse } from "../../../../../contexts/shared/infrastructure/http/HttpNextResponse";
 import { PostgresConnection } from "../../../../../contexts/shared/infrastructure/persistence/PostgresConnection";
@@ -34,7 +37,7 @@ export async function PUT(
 
 	const body = validatedRequest.right;
 
-	const postgresConnection = new PostgresConnection();
+	const postgresConnection = container.get(PostgresConnection);
 
 	const creator = new ProductCreator(new PostgresProductRepository(postgresConnection));
 
@@ -54,7 +57,7 @@ export async function GET(
 	_request: Request,
 	{ params: { id } }: { params: { id: string } },
 ): Promise<NextResponse<ProductPrimitives> | Response> {
-	const postgresConnection = new PostgresConnection();
+	const postgresConnection = container.get(PostgresConnection);
 
 	const finder = new ProductFinder(new PostgresProductRepository(postgresConnection));
 

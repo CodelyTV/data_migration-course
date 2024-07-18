@@ -47,7 +47,15 @@ export class RetentionUser {
 	}
 
 	incrementTotalReviews(): void {
+		if (!this.totalReviewsHaveBeenImported()) {
+			throw new Error("User total reviews is pending to import for the first time");
+		}
+
 		this.totalReviews = (this.totalReviews ?? 0) + 1;
+	}
+
+	totalReviewsHaveBeenImported(): boolean {
+		return this.totalReviews !== null;
 	}
 
 	toPrimitives(): RetentionUserPrimitives {

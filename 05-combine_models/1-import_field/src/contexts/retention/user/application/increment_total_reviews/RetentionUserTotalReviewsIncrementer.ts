@@ -14,10 +14,6 @@ export class RetentionUserTotalReviewsIncrementer {
 	async increment(id: string): Promise<void> {
 		const user = await this.finder.find(id);
 
-		if (!user.toPrimitives().totalReviews) {
-			throw new Error("User total reviews is null, we'll retry later");
-		}
-
 		user.incrementTotalReviews();
 
 		await this.repository.save(user);

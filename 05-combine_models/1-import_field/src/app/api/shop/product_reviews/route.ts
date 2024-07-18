@@ -1,5 +1,8 @@
+import "reflect-metadata";
+
 import { NextRequest, NextResponse } from "next/server";
 
+import { container } from "../../../../contexts/shared/infrastructure/dependency_injection/diod.config";
 import { HttpNextResponse } from "../../../../contexts/shared/infrastructure/http/HttpNextResponse";
 import { PostgresConnection } from "../../../../contexts/shared/infrastructure/persistence/PostgresConnection";
 import { ProductReviewsByProductSearcher } from "../../../../contexts/shop/product_reviews/application/search_by_product_id/ProductReviewsByProductSearcher";
@@ -9,8 +12,10 @@ import { ProductPrimitives } from "../../../../contexts/shop/products/domain/Pro
 export async function GET(
 	request: NextRequest,
 ): Promise<NextResponse<ProductPrimitives[]> | Response> {
+	const postgresConnection = container.get(PostgresConnection);
+
 	const searcher = new ProductReviewsByProductSearcher(
-		new PostgresProductReviewRepository(new PostgresConnection()),
+		new PostgresProductReviewRepository(postgresConnection),
 	);
 
 	const id = new URL(request.url).searchParams.get("product_id");

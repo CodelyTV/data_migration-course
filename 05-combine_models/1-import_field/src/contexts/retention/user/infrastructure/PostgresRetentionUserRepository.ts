@@ -38,7 +38,7 @@ export class PostgresRetentionUserRepository extends RetentionUserRepository {
 	}
 
 	async search(id: UserId): Promise<RetentionUser | null> {
-		const query = `SELECT id, email, last_activity_date, registration_date FROM retention.users WHERE id = '${id.value}';`;
+		const query = `SELECT id, email, last_activity_date, registration_date, total_reviews FROM retention.users WHERE id = '${id.value}';`;
 
 		const result = await this.connection.searchOne<DatabaseUser>(query);
 

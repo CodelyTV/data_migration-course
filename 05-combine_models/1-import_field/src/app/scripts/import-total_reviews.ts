@@ -1,9 +1,11 @@
 /* eslint-disable no-constant-condition,no-await-in-loop,no-promise-executor-return */
 // noinspection InfiniteLoopJS
+import "reflect-metadata";
 
+import { container } from "../../contexts/shared/infrastructure/dependency_injection/diod.config";
 import { PostgresConnection } from "../../contexts/shared/infrastructure/persistence/PostgresConnection";
 
-const connection = new PostgresConnection();
+const connection = container.get(PostgresConnection);
 
 async function searchUsersWithoutTotalReviews(batchSize: number): Promise<{ id: string }[]> {
 	return await connection.searchAll<{ id: string }>(`
