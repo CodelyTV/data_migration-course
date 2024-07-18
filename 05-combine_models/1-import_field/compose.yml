@@ -1,5 +1,5 @@
 services:
-  5_2_first_importation-postgres:
+  5_1_first_importation-postgres:
     image: postgres:latest
     restart: unless-stopped
 
@@ -14,7 +14,7 @@ services:
       - ./databases/postgres:/docker-entrypoint-initdb.d
       - ./databases/data:/docker-entrypoint-initdb.d/data
 
-  5_2_first_importation-rabbitmq:
+  5_1_first_importation-rabbitmq:
     image: rabbitmq:3.12-management
     restart: unless-stopped
     ports:
