@@ -17,7 +17,7 @@ object Importer {
 
     case class UserReviews(userId: String, totalReviews: Int)
 
-    val selectFlow = Flow[String].mapAsync(parallelism = 2) { userId =>
+    val selectTotalReviewsFlow = Flow[String].mapAsync(parallelism = 2) { userId =>
 //      Thread.sleep(1000)
 
       session.db.run(
@@ -54,7 +54,7 @@ object Importer {
         println(s"Processing user: ${user._2}: ${user._1}")
         user._1
       })
-      .via(selectFlow)
+      .via(selectTotalReviewsFlow)
       .runWith(updateSink)
       .onComplete { tryResult =>
         system.terminate()
