@@ -1,14 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Service } from "diod";
 import postgres from "postgres";
 
+@Service()
 export class PostgresConnection {
 	private sqlInstance: postgres.Sql | null = null;
+
+	constructor(private readonly port: number = 5432) {}
 
 	get sql(): postgres.Sql {
 		if (!this.sqlInstance) {
 			this.sqlInstance = postgres({
 				host: "localhost",
-				port: 5432,
+				port: this.port,
 				user: "codely",
 				password: "c0d3ly7v",
 				database: "ecommerce",

@@ -12,7 +12,11 @@ export class IncrementRetentionUserTotalReviewsOnProductReviewCreated
 	constructor(private readonly incrementer: RetentionUserTotalReviewsIncrementer) {}
 
 	async on(event: ProductReviewCreatedDomainEvent): Promise<void> {
-		await this.incrementer.increment(event.userId);
+		const xMoment = "2024-07-23T17:09:58Z";
+
+		if (event.occurredOn > new Date(xMoment)) {
+			await this.incrementer.increment(event.userId);
+		}
 	}
 
 	subscribedTo(): DomainEventClass[] {

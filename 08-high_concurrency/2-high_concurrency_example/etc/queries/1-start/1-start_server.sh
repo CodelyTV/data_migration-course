@@ -1,1 +1,1 @@
-npm run dev -prefix ../../../
+npm run configure-rabbitmq -prefix ../../../ && npm run dev -prefix ../../../

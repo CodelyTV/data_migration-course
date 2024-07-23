@@ -1,5 +1,5 @@
 services:
-  7_2_first_importation-postgres:
+  8_2_first_importation-postgres:
     image: postgres:latest
     restart: unless-stopped
     environment:
@@ -12,29 +12,31 @@ services:
       - pg_data:/var/lib/postgresql/data
       - ./databases/postgres:/docker-entrypoint-initdb.d
       - ./databases/data:/docker-entrypoint-initdb.d/data
+      - ./etc/postgres/init-primary.sh:/docker-entrypoint-initdb.d/init-primary.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U codely -d ecommerce"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  7_2_first_importation-elasticsearch:
-    image: elasticsearch:8.14.3
-    ports:
-      - "9200:9200"
-      - "9300:9300"
+  8_2_first_importation-postgres-replica:
+    image: postgres:latest
+    restart: unless-stopped
     environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-
-  7_2_first_importation-logstash:
-    image: logstash:8.14.3
-    volumes:
-      - ./etc/logstash/config:/usr/share/logstash/config
-      - ./etc/logstash/pipeline:/usr/share/logstash/pipeline
-      - ./databases/data:/usr/share/logstash/queries
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: codely
+      POSTGRES_PASSWORD: c0d3ly7v
     ports:
-      - "5044:5044"
+      - "5433:5432"
+    volumes:
+      - pg_replica_data_new:/var/lib/postgresql/data
+      - ./etc/postgres/init-replica.sh:/docker-entrypoint-initdb.d/init-replica.sh
+    command: ["postgres", "-c", "log_statement=all", "-c", "hot_standby=on"]
     depends_on:
-      - 7_2_first_importation-elasticsearch
+      8_2_first_importation-postgres:
+        condition: service_healthy
 
-  7_2_first_importation-rabbitmq:
+  8_2_first_importation-rabbitmq:
     image: rabbitmq:3.12-management
     restart: unless-stopped
     ports:
@@ -46,3 +48,4 @@ services:
 
 volumes:
   pg_data:
+  pg_replica_data_new:

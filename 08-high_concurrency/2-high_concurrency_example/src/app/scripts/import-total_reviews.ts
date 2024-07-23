@@ -6,6 +6,7 @@ import { container } from "../../contexts/shared/infrastructure/dependency_injec
 import { PostgresConnection } from "../../contexts/shared/infrastructure/persistence/PostgresConnection";
 
 const connection = container.get(PostgresConnection);
+const replicaConnection = new PostgresConnection(5433);
 
 async function searchUsersWithoutTotalReviews(batchSize: number): Promise<{ id: string }[]> {
 	return await connection.searchAll<{ id: string }>(`
@@ -28,7 +29,7 @@ async function main(): Promise<void> {
 
 	while (users.length > 0) {
 		for (const user of users) {
-			const totalReviews = await connection.searchOne<{ total: number }>(`
+			const totalReviews = await replicaConnection.searchOne<{ total: number }>(`
 				SELECT COUNT(*) AS total FROM shop.product_reviews WHERE user_id = '${user.id}'
 			`);
 

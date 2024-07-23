@@ -41,7 +41,12 @@ const builder = new ContainerBuilder();
 // Shared
 builder.register(UuidGenerator).use(OfficialUuidGenerator);
 
-builder.registerAndUse(PostgresConnection).asSingleton();
+builder
+	.register(PostgresConnection)
+	.useFactory(() => {
+		return new PostgresConnection();
+	})
+	.asSingleton();
 
 builder.registerAndUse(RabbitMqConnection).asSingleton();
 builder.registerAndUse(DomainEventFailover);
