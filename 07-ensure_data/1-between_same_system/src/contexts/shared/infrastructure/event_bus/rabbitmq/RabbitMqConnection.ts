@@ -34,8 +34,8 @@ export class RabbitMqConnection {
 	};
 
 	async connect(): Promise<void> {
-		this.amqpConnection = await this.amqpConnect();
-		this.amqpChannel = await this.amqpChannelConnect();
+		this.amqpConnection = this.amqpConnection ?? (await this.amqpConnect());
+		this.amqpChannel = this.amqpChannel ?? (await this.amqpChannelConnect());
 	}
 
 	async close(): Promise<void> {

@@ -14,6 +14,8 @@
     "import-total_reviews": "ts-node ./src/app/scripts/import-total_reviews.ts",
     "simulate-usage": "ts-node ./src/app/scripts/simulate-usage.ts",
     "generate-csvs": "ts-node ./src/app/scripts/generate-csvs.ts",
+    "compare-users": "ts-node ./src/app/scripts/compare-users.ts",
+    "compare-users-with_indices": "ts-node ./src/app/scripts/compare-users-with_indices.ts",
     "configure-rabbitmq": "ts-node ./src/app/scripts/configure-rabbitmq.ts",
     "consume-rabbitmq": "ts-node ./src/app/scripts/consume-rabbitmq.ts"
   },

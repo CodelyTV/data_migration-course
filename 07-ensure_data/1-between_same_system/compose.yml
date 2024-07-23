@@ -1,8 +1,9 @@
 services:
-  5_1_first_importation-postgres:
+  7_1_first_importation-postgres:
     image: postgres:latest
     restart: unless-stopped
-
+    command: >
+      -c max_wal_size=2GB
     environment:
       POSTGRES_DB: ecommerce
       POSTGRES_USER: codely
@@ -10,11 +11,11 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql/data
       - ./databases/postgres:/docker-entrypoint-initdb.d
       - ./databases/data:/docker-entrypoint-initdb.d/data
 
-  5_1_first_importation-rabbitmq:
+  7_1_first_importation-rabbitmq:
     image: rabbitmq:3.12-management
     restart: unless-stopped
     ports:
@@ -25,5 +26,5 @@ services:
       - RABBITMQ_DEFAULT_PASS=codely
 
 volumes:
-  db_data:
-  prometheus_data:
+  pg_data:
+  mysql_data:

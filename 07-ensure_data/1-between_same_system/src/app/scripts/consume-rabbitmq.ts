@@ -10,7 +10,7 @@ import { container } from "../../contexts/shared/infrastructure/dependency_injec
 import { DomainEventJsonDeserializer } from "../../contexts/shared/infrastructure/event_bus/DomainEventJsonDeserializer";
 import { RabbitMqConnection } from "../../contexts/shared/infrastructure/event_bus/rabbitmq/RabbitMqConnection";
 
-const connection = new RabbitMqConnection();
+const connection = container.get(RabbitMqConnection);
 const maxRetries = 3;
 
 const subscribers = container

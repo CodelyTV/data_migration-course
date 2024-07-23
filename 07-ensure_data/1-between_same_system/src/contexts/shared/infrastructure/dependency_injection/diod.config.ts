@@ -43,9 +43,9 @@ builder.register(UuidGenerator).use(OfficialUuidGenerator);
 
 builder.registerAndUse(PostgresConnection).asSingleton();
 
-builder.registerAndUse(RabbitMqConnection);
+builder.registerAndUse(RabbitMqConnection).asSingleton();
 builder.registerAndUse(DomainEventFailover);
-builder.register(EventBus).use(RabbitMqEventBus);
+builder.register(EventBus).use(RabbitMqEventBus).asSingleton();
 
 // Shop context
 builder.register(ProductRepository).use(PostgresProductRepository);
