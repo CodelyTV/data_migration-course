@@ -7,24 +7,58 @@ import { PostgresConnection } from "../../contexts/shared/infrastructure/persist
 
 const connection = container.get(PostgresConnection);
 
-async function searchShopUsers(date: Date): Promise<number> {
-	const result = await connection.searchAll<{ total: number }>(
-		`SELECT count(*) as total FROM shop.users WHERE DATE(created_at) = '${date.toISOString().split("T")[0]}'`,
+async function searchPostgresUsers(date: Date): Promise<number> {
+	const result = await connection.searchAll<{ total: string }>(
+		`SELECT count(*) as total 
+FROM shop.users 
+WHERE created_at >= '${date.toISOString().split("T")[0]}'::date 
+  AND created_at < ('${date.toISOString().split("T")[0]}'::date + interval '1 day')`,
 	);
 
-	return result[0].total;
+	return parseInt(result[0].total, 10);
 }
 
-async function searchRetentionUsers(date: Date): Promise<number> {
-	const result = await connection.searchAll<{ total: number }>(
-		`SELECT count(*) as total FROM retention.users WHERE DATE(registration_date) = '${date.toISOString().split("T")[0]}'`,
+async function searchElasticUsers(date: Date): Promise<number> {
+	const startOfDay = new Date(
+		Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0),
+	);
+	const endOfDay = new Date(
+		Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999),
 	);
 
-	return result[0].total;
+	try {
+		const response = await fetch("http://localhost:9200/users/_count", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				query: {
+					range: {
+						created_at: {
+							gte: startOfDay,
+							lt: endOfDay,
+						},
+					},
+				},
+			}),
+		});
+
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+
+		const data = await response.json();
+
+		return data.count as number;
+	} catch (error) {
+		console.error("Error fetching from Elasticsearch:", error);
+
+		return 0;
+	}
 }
 
 async function main(): Promise<void> {
-	console.log(process.argv);
 	const startDate = new Date(process.argv[2]);
 	const endDate = new Date(process.argv[3]);
 
@@ -32,16 +66,16 @@ async function main(): Promise<void> {
 	let hasOccurredAnError = false;
 
 	while (currentDate <= endDate) {
-		const totalShopUsers = await searchShopUsers(currentDate);
-		const totalRetentionUsers = await searchRetentionUsers(currentDate);
+		const totalPostgresUsers = await searchPostgresUsers(currentDate);
+		const totalElasticUsers = await searchElasticUsers(currentDate);
 
-		if (totalShopUsers === totalRetentionUsers) {
-			console.log(`✅ ${currentDate.toISOString().split("T")[0]}: ${totalShopUsers} users`);
+		if (totalPostgresUsers === totalElasticUsers) {
+			console.log(`✅ ${currentDate.toISOString().split("T")[0]}: ${totalPostgresUsers} users`);
 		} else {
 			hasOccurredAnError = true;
 
 			console.log(
-				`❌ ${currentDate.toISOString().split("T")[0]}: Shop users: ${totalShopUsers}, Retention users: ${totalRetentionUsers}`,
+				`❌ ${currentDate.toISOString().split("T")[0]}: Shop users: ${totalPostgresUsers}, Retention users: ${totalElasticUsers}`,
 			);
 		}
 

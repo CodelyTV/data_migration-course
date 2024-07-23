@@ -37,7 +37,7 @@ async function main(): Promise<void> {
 	// 	return `${product.id}${csvDelimiter}${product.name}${csvDelimiter}${product.price.amount}${csvDelimiter}${product.price.currency}${csvDelimiter}{${product.imageUrls.map((image) => `"${image}"`).join(",")}}${csvDelimiter}`;
 	// });
 
-	await csvGenerator("databases/data/users.csv", 10_000_000, 10_000, () => {
+	await csvGenerator("databases/data/users.csv", 1_000_000, 10_000, () => {
 		const user = UserMother.create().toPrimitives();
 		const createdAt = faker.date.between({ from: "2020-01-01", to: "2025-12-31" }).toISOString();
 

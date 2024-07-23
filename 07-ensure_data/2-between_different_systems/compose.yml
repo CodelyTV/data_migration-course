@@ -1,9 +1,7 @@
 services:
-  7_1_first_importation-postgres:
+  7_2_first_importation-postgres:
     image: postgres:latest
     restart: unless-stopped
-    command: >
-      -c max_wal_size=2GB
     environment:
       POSTGRES_DB: ecommerce
       POSTGRES_USER: codely
@@ -15,7 +13,28 @@ services:
       - ./databases/postgres:/docker-entrypoint-initdb.d
       - ./databases/data:/docker-entrypoint-initdb.d/data
 
-  7_1_first_importation-rabbitmq:
+  7_2_first_importation-elasticsearch:
+    image: elasticsearch:8.14.3
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+
+  7_2_first_importation-logstash:
+    image: logstash:8.14.3
+    volumes:
+      - ./etc/logstash/config:/usr/share/logstash/config
+      - ./etc/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./databases/data:/usr/share/logstash/queries
+    ports:
+      - "5044:5044"
+    depends_on:
+      - 7_2_first_importation-elasticsearch
+
+  7_2_first_importation-rabbitmq:
     image: rabbitmq:3.12-management
     restart: unless-stopped
     ports:
@@ -27,4 +46,3 @@ services:
 
 volumes:
   pg_data:
-  mysql_data:

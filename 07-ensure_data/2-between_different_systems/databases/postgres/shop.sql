@@ -8,6 +8,9 @@ CREATE TABLE shop.users (
 	created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+CREATE INDEX idx__shop_users__created_at__date_search
+	ON shop.users USING btree (created_at);
+
 CREATE TABLE shop.products (
 	id UUID PRIMARY KEY,
 	name VARCHAR NOT NULL,
