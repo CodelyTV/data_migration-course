@@ -1,0 +1,13 @@
+### Health check
+GET http://localhost:9200/_cluster/health
+
+### GET count users
+GET http://localhost:9200/users/_count
+
+### GET one user
+GET http://localhost:9200/users/_search
+Content-Type: application/json
+
+{
+	"size": 1
+}
