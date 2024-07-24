@@ -27,6 +27,6 @@ CREATE TABLE shop.product_reviews (
 
 -- Import data
 COPY shop.users(id, name, email, profile_picture, created_at)
-	FROM '/docker-entrypoint-initdb.d/data/users.csv' DELIMITER ';' CSV HEADER;
+	FROM '/docker-entrypoint-initdb.d/data/users.csv' DELIMITER ';' CSV;
 COPY shop.products(id, name, price_amount, price_currency, image_urls, latest_top_reviews)
-	FROM '/docker-entrypoint-initdb.d/data/products.csv' DELIMITER ';' CSV HEADER;
+	FROM '/docker-entrypoint-initdb.d/data/products.csv' DELIMITER ';' CSV;

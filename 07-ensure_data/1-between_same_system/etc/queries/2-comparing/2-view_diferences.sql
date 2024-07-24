@@ -18,5 +18,5 @@ SELECT
 		END AS tabla_que_contiene_id,
 	COALESCE(shop.users.id, retention.users.id) AS id_no_coincidente
 FROM shop.users
-		 FULL JOIN retention.users ON shop.users.id = retention.users.id
+	 FULL JOIN retention.users ON shop.users.id = retention.users.id
 WHERE shop.users.id IS NULL OR retention.users.id IS NULL;
