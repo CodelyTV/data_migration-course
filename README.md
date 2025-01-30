@@ -9,7 +9,7 @@
 </p>
 
 <h1 align="center">
-    {COURSE_EMOJI} {COURSE_NAME_IN_ENGLISH}
+    📥 Data Migration: From Legacy to Event-Driven Architecture
 </h1>
 
 <p align="center">
@@ -18,10 +18,10 @@
 </p>
 
 <p align="center">
-    {COURSE_SUMMARY_IN_ENGLISH}
+    Learn to migrate data from legacy code to an event-driven architecture.
 </p>
 
 <p align="center">
-  <a href="https://github.com/CodelyTV/{REPOSITORY_NAME}/stargazers">Stars are welcome 😊</a><br><br>
-  Course (Spanish): <a href="{COURSE_URL}">{COURSE_NAME_IN_SPANISH}</a>
+  <a href="https://github.com/CodelyTV/data_migration-course/stargazers">Stars are welcome 😊</a><br><br>
+  Course (Spanish): <a href="https://pro.codely.com/library/migracion-de-datos-de-legacy-a-event-driven-architecture">Migración de Datos: De Legacy a Event-Driven Architecture</a>
 </p>
